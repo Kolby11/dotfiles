@@ -1,0 +1,28 @@
+[config]
+# Reload kitty after generating colors
+reload_apps = true
+
+[templates.quickshell]
+input_path = '~/.config/matugen/templates/quickshell.qml'
+output_path = '~/.config/quickshell/MatugenColors.qml'
+
+[templates.starship]
+input_path = '~/.config/matugen/templates/starship.conf'
+output_path = '~/.config/starship.toml'
+
+[templates.kitty]
+input_path = '~/.config/matugen/templates/kitty.conf'
+output_path = '~/.config/kitty/themes/Matugen.conf'
+post_hook = "kitty +kitten themes --reload-in=all Matugen"
+
+[[custom_keywords]]
+name = "background"
+color = "background"
+
+[[custom_keywords]]
+name = "foreground"
+color = "on_background"
+
+[[config.reload_apps_list.kitty]]
+# Automatically reload kitty when colors change
+type = "kitty"
