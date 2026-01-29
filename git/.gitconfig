@@ -1,0 +1,17 @@
+[user]
+    name = Martin Kollar
+    email = mato.kollar2004@gmail.com
+
+[core]
+    editor = code --wait  # Or vim, nano, etc.
+    excludesfile = ~/.gitignore_global
+
+[alias]
+    st = status
+    co = checkout
+    br = branch
+    cm = commit
+    lg = log --oneline --graph --decorate
+
+[init]
+    defaultBranch = main
