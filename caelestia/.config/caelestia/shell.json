@@ -202,7 +202,7 @@
         }
     },
     "border": {
-        "rounding": 25,
+        "rounding": 15,
         "thickness": 10
     },
     "dashboard": {

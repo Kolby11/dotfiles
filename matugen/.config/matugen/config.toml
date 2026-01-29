@@ -4,16 +4,24 @@ reload_apps = true
 
 [templates.quickshell]
 input_path = '~/.config/matugen/templates/quickshell.qml'
-output_path = '~/.config/quickshell/MatugenColors.qml'
+output_path = '~/.config/quickshell/matugen-quickshell.qml'
 
 [templates.starship]
-input_path = '~/.config/matugen/templates/starship.conf'
+input_path = '~/.config/matugen/templates/matugen-starship.conf'
 output_path = '~/.config/starship.toml'
 
 [templates.kitty]
-input_path = '~/.config/matugen/templates/kitty.conf'
-output_path = '~/.config/kitty/themes/Matugen.conf'
+input_path = '~/.config/matugen/templates/matugen-kitty.conf'
+output_path = '~/.config/kitty/themes/matugen-kitty.conf'
 post_hook = "kitty +kitten themes --reload-in=all Matugen"
+
+[templates.hyprland]
+input_path = '~/.config/matugen/templates/matugen-hyprland.conf'
+output_path = '~/.config/hypr/matugen/matugen-hyprland.conf'
+
+[templates.spicetify]
+input_path = '~/.config/matugen/templates/spicetify-colors.ini'
+output_path = '~/.config/spicetify/Themes/Comfy/color.ini'
 
 [[custom_keywords]]
 name = "background"
