@@ -8,3 +8,7 @@ To symlink all configurations to your home directory, run the following command 
 
 ```bash
 stow -vt ~ */
+
+
+# Fastfetch themes
+src - https://github.com/LierB/fastfetch
