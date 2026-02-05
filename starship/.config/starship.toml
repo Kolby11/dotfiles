@@ -1,0 +1,171 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+palette = "matugen"
+
+format = """
+[](color_1)\
+$os\
+$username\
+[](bg:color_2 fg:color_1)\
+$directory\
+[](bg:color_3 fg:color_2)\
+$git_branch\
+$git_status\
+[](fg:color_3 bg:color_4)\
+$c\
+$rust\
+$golang\
+$nodejs\
+$php\
+$java\
+$kotlin\
+$haskell\
+$python\
+[](fg:color_4 bg:color_5)\
+$docker_context\
+$conda\
+$pixi\
+[](fg:color_5 bg:color_6)\
+$time\
+[ ](fg:color_6)\
+$cmd_duration\
+$line_break\
+$character"""
+
+[os]
+disabled = false
+style = "bg:color_1 fg:color_text_dark"
+
+[os.symbols]
+Windows = ""
+Ubuntu = "󰕈"
+SUSE = ""
+Raspbian = "󰐿"
+Mint = "󰣭"
+Macos = "󰀵"
+Manjaro = ""
+Linux = "󰌽"
+Gentoo = "󰣨"
+Fedora = "󰣛"
+Alpine = ""
+Amazon = ""
+Android = ""
+Arch = "󰣇"
+Artix = "󰣇"
+CentOS = ""
+Debian = "󰣚"
+Redhat = "󱄛"
+RedHatEnterprise = "󱄛"
+
+[username]
+show_always = true
+style_user = "bg:color_1 fg:color_text_dark"
+style_root = "bg:color_1 fg:color_text_dark"
+format = '[ $user]($style)'
+
+[directory]
+style = "bg:color_2 fg:color_text_dark"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[directory.substitutions]
+"Documents" = "󰈙 "
+"Downloads" = " "
+"Music" = "󰝚 "
+"Pictures" = " "
+"Developer" = "󰲋 "
+
+[git_branch]
+symbol = ""
+style = "bg:color_3"
+format = '[[ $symbol $branch ](fg:color_text_dark bg:color_3)]($style)'
+
+[git_status]
+style = "bg:color_3"
+format = '[[($all_status$ahead_behind )](fg:color_text_dark bg:color_3)]($style)'
+
+[nodejs]
+symbol = ""
+style = "bg:color_4"
+format = '[[ $symbol( $version) ](fg:color_text_light bg:color_4)]($style)'
+
+[c]
+symbol = " "
+style = "bg:color_4"
+format = '[[ $symbol( $version) ](fg:color_text_light bg:color_4)]($style)'
+
+[rust]
+symbol = ""
+style = "bg:color_4"
+format = '[[ $symbol( $version) ](fg:color_text_light bg:color_4)]($style)'
+
+[golang]
+symbol = ""
+style = "bg:color_4"
+format = '[[ $symbol( $version) ](fg:color_text_light bg:color_4)]($style)'
+
+[php]
+symbol = ""
+style = "bg:color_4"
+format = '[[ $symbol( $version) ](fg:color_text_light bg:color_4)]($style)'
+
+[java]
+symbol = " "
+style = "bg:color_4"
+format = '[[ $symbol( $version) ](fg:color_text_light bg:color_4)]($style)'
+
+[kotlin]
+symbol = ""
+style = "bg:color_4"
+format = '[[ $symbol( $version) ](fg:color_text_light bg:color_4)]($style)'
+
+[haskell]
+symbol = ""
+style = "bg:color_4"
+format = '[[ $symbol( $version) ](fg:color_text_light bg:color_4)]($style)'
+
+[python]
+symbol = ""
+style = "bg:color_4"
+format = '[[ $symbol( $version)(\($virtualenv\)) ](fg:color_text_light bg:color_4)]($style)'
+
+[docker_context]
+symbol = ""
+style = "bg:color_5"
+format = '[[ $symbol( $context) ](fg:color_text_light bg:color_5)]($style)'
+
+[conda]
+symbol = "  "
+style = "fg:color_text_light bg:color_5"
+format = '[$symbol$environment ]($style)'
+ignore_base = false
+
+[pixi]
+style = "fg:color_text_light bg:color_5"
+format = '[[ $symbol( $version)( $environment) ](fg:color_text_light bg:color_5)]($style)'
+
+[time]
+disabled = false
+time_format = "%R"
+style = "bg:color_6"
+format = '[[  $time ](fg:color_text_light bg:color_6)]($style)'
+
+[line_break]
+disabled = true
+
+[character]
+disabled = false
+success_symbol = '[❯](bold fg:color_success)'
+error_symbol = '[❯](bold fg:color_error)'
+vimcmd_symbol = '[❮](bold fg:color_success)'
+vimcmd_replace_one_symbol = '[❮](bold fg:color_3)'
+vimcmd_replace_symbol = '[❮](bold fg:color_3)'
+vimcmd_visual_symbol = '[❮](bold fg:color_2)'
+
+[cmd_duration]
+show_milliseconds = true
+format = " in $duration "
+disabled = false
+show_notifications = true
+min_time_to_notify = 45000
