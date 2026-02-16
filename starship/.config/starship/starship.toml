@@ -3,16 +3,17 @@
 palette = "matugen"
 
 format = """
-[](color_1)\
+[](color_1)\
 $os\
 $username\
-[](bg:color_2 fg:color_1)\
+[](bg:color_2 fg:color_1)\
 $directory\
-[](bg:color_3 fg:color_2)\
+[](fg:color_2 bg:color_3)\
 $git_branch\
 $git_status\
-[](fg:color_3 bg:color_4)\
+[](fg:color_3 bg:color_4)\
 $c\
+$cpp\
 $rust\
 $golang\
 $nodejs\
@@ -21,16 +22,15 @@ $java\
 $kotlin\
 $haskell\
 $python\
-[](fg:color_4 bg:color_5)\
+[](fg:color_4 bg:color_5)\
 $docker_context\
 $conda\
 $pixi\
-[](fg:color_5 bg:color_6)\
+[](fg:color_5 bg:color_6)\
 $time\
-[ ](fg:color_6)\
-$cmd_duration\
-$line_break\
-$character"""
+[ ](fg:color_6)\
+$line_break$character"""
+
 
 [os]
 disabled = false
@@ -170,19 +170,6 @@ disabled = false
 show_notifications = true
 min_time_to_notify = 45000
 
-[palettes.matugen]
-color_1 = '#80d5d3'
-color_2 = '#b0ccca'
-color_3 = '#b2c8e8'
-color_4 = '#00504f'
-color_5 = '#324b4a'
-color_6 = '#334863'
-color_bg = '#0e1514'
-color_fg = '#dde4e3'
-color_text_dark = '#003736'
-color_text_light = '#9cf1ef'
-color_error = '#ffb4ab'
-color_success = '#80d5d3'
 [palettes.matugen]
 color_1 = '#80d5d3'
 color_2 = '#b0ccca'

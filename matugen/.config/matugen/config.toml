@@ -15,10 +15,10 @@ color = "on_background"
 input_path = '~/.config/matugen/templates/matugen-quickshell.qml'
 output_path = '~/.config/quickshell/matugen-quickshell.qml'
 
-[templates.starship]
-input_path = '~/.config/matugen/templates/matugen-starship.toml'
-output_path = '~/.config/starship/palette.toml'
-post_hook = ". ~/.config/matugen/merge-starship.sh"
+[templates.omp]
+input_path = '~/.config/matugen/templates/matugen-omp.json'
+output_path = '~/.config/omp/palette.json'
+post_hook = "bash ~/.config/matugen/merge-omp.sh"
 
 [templates.kitty]
 input_path = '~/.config/matugen/templates/matugen-kitty.conf'
@@ -36,3 +36,7 @@ output_path = '~/.config/spicetify/Themes/Comfy/color.ini'
 [templates.yazi]
 input_path = '~/.config/matugen/templates/matugen-yazi.conf'
 output_path = '~/.config/yazi/theme.toml'
+
+[templates.vscode]
+input_path = '~/.config/matugen/templates/vscode.json'
+output_path = '~/.config/Code/User/settings.json'
