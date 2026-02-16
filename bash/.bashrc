@@ -1,4 +1,4 @@
 # ~/.bashrc
 
-export STARSHIP_CONFIG=~/dotfiles/starship/starship.toml
+export STARSHIP_CONFIG=~/.config/starship/starship.toml
 eval "$(starship init bash)"

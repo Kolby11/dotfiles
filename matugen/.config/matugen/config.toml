@@ -2,7 +2,6 @@
 # Reload kitty after generating colors
 reload_apps = true
 reload_apps_list = ["starship", "kitty"]
-run_after = ['cat ~/.config/starship/config.toml ~/.config/starship/palette.toml > ~/.config/starship.toml']
 
 [[custom_keywords]]
 name = "background"
@@ -16,14 +15,15 @@ color = "on_background"
 input_path = '~/.config/matugen/templates/matugen-quickshell.qml'
 output_path = '~/.config/quickshell/matugen-quickshell.qml'
 
-[templates.starship-palette]
+[templates.starship]
 input_path = '~/.config/matugen/templates/matugen-starship.toml'
 output_path = '~/.config/starship/palette.toml'
+post_hook = ". ~/.config/matugen/merge-starship.sh"
 
 [templates.kitty]
 input_path = '~/.config/matugen/templates/matugen-kitty.conf'
-output_path = '~/.config/kitty/themes/matugen-kitty.conf'
-post_hook = "kitty +kitten themes --reload-in=all matugen-kitty"
+output_path = '~/.config/kitty/themes/Matugen.conf'
+post_hook = "kitty +kitten themes --reload-in=all Matugen"
 
 [templates.hyprland]
 input_path = '~/.config/matugen/templates/matugen-hyprland.conf'
