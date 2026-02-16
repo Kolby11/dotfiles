@@ -1,22 +1,32 @@
 #!/usr/bin/env bash
-
 # Merge the generated colors into the main starship config
-COLORS_FILE="$HOME/.config/starship-colors.toml"
-MAIN_CONFIG="$HOME/.config/starship.toml"
-TEMP_CONFIG="$HOME/.config/starship-temp.toml"
+COLORS_FILE="$HOME/.config/starship/palette.toml"
+MAIN_CONFIG="$HOME/.config/starship/starship.toml"
+TEMP_CONFIG="$HOME/.config/starship/starship-temp.toml"
 
 if [[ -f "$COLORS_FILE" ]]; then
-    # Read the main config and replace the [palettes.matugen] section
-    awk '
-    /^\[palettes\.matugen\]/ { 
-        print $0
-        system("cat '"$COLORS_FILE"'")
-        skip=1
-        next
-    }
-    /^\[/ && skip { skip=0 }
-    !skip { print }
-    ' "$MAIN_CONFIG" > "$TEMP_CONFIG"
-    
-    mv "$TEMP_CONFIG" "$MAIN_CONFIG"
+    if grep -q '^\[palettes\.matugen\]' "$MAIN_CONFIG"; then
+        # Section exists - replace it
+        awk '
+        /^\[palettes\.matugen\]/ { 
+            print $0
+            while ((getline line < "'"$COLORS_FILE"'") > 0) {
+                if (line !~ /^\[palettes\.matugen\]/) {
+                    print line
+                }
+            }
+            close("'"$COLORS_FILE"'")
+            skip=1
+            next
+        }
+        /^\[/ && skip { skip=0 }
+        !skip { print }
+        ' "$MAIN_CONFIG" > "$TEMP_CONFIG"
+        mv "$TEMP_CONFIG" "$MAIN_CONFIG"
+    else
+        # Section doesn't exist - append it
+        echo "" >> "$MAIN_CONFIG"
+        cat "$COLORS_FILE" >> "$MAIN_CONFIG"
+    fi
+    echo "Merged palette into starship config"
 fi

@@ -169,3 +169,17 @@ format = " in $duration "
 disabled = false
 show_notifications = true
 min_time_to_notify = 45000
+
+[palettes.matugen]
+color_1 = '#c1c1ff'
+color_2 = '#c6c4dd'
+color_3 = '#e9b9d3'
+color_4 = '#404178'
+color_5 = '#454559'
+color_6 = '#5f3c51'
+color_bg = '#131318'
+color_fg = '#e4e1e9'
+color_text_dark = '#292a60'
+color_text_light = '#e1dfff'
+color_error = '#ffb4ab'
+color_success = '#c1c1ff'
