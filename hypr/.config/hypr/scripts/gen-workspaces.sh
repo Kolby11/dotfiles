@@ -28,8 +28,8 @@ generate() {
 
         # Desktop switch keybinds
         for ((d = 0; d < DESKTOPS; d++)); do
-            local key=$((d + 1))
-            echo -n "bind = \$mainMod CTRL, $key, exec, \\"
+            local key="f"$((d + 1))
+            echo -n "bind = \$mainMod, $key, exec, \\"
             echo ""
             for ((m = 0; m < n; m++)); do
                 ws=$((d * n + m + 1))
