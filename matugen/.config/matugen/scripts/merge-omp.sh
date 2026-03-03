@@ -19,3 +19,8 @@ theme["palette"] = palette
 with open("$THEME", "w") as f:
     json.dump(theme, f, indent=4)
 EOF
+
+# Signal all bash processes to reload oh-my-posh
+# Trap USR1 so this script isn't killed by its own pkill
+trap '' USR1
+pkill -USR1 bash

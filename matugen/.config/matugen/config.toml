@@ -18,7 +18,7 @@ output_path = '~/.config/quickshell/matugen-quickshell.qml'
 [templates.omp]
 input_path = '~/.config/matugen/templates/matugen-omp.json'
 output_path = '~/.config/omp/palette.json'
-post_hook = "bash ~/.config/matugen/merge-omp.sh"
+post_hook = "bash ~/.config/matugen/scripts/merge-omp.sh"
 
 [templates.kitty]
 input_path = '~/.config/matugen/templates/matugen-kitty.conf'
@@ -30,7 +30,7 @@ input_path = '~/.config/matugen/templates/matugen-hyprland.conf'
 output_path = '~/.config/hypr/matugen/matugen-hyprland.conf'
 
 [templates.spicetify]
-input_path = '~/.config/matugen/templates/spicetify-colors.ini'
+input_path = '~/.config/matugen/templates/matugen-spicetify.ini'
 output_path = '~/.config/spicetify/Themes/Comfy/color.ini'
 
 [templates.yazi]
@@ -38,5 +38,6 @@ input_path = '~/.config/matugen/templates/matugen-yazi.conf'
 output_path = '~/.config/yazi/theme.toml'
 
 [templates.vscode]
-input_path = '~/.config/matugen/templates/vscode.json'
-output_path = '~/.config/Code/User/settings.json'
+input_path = '~/.config/matugen/templates/matugen-vscode.json'
+output_path = '~/.config/matugen/vscode-colors.json'
+post_hook = "bash ~/.config/matugen/scripts/merge-vscode.sh"
