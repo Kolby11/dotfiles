@@ -1,0 +1,62 @@
+# Workspaces - auto-generated from monitors.conf, do not edit manually
+
+workspace = 1, monitor:DP-1
+workspace = 2, monitor:eDP-1
+workspace = 3, monitor:DP-2
+workspace = 4, monitor:DP-2
+workspace = 5, monitor:HDMI-A-1
+workspace = 6, monitor:HDMI-A-1
+
+workspace = 7, monitor:DP-1
+workspace = 8, monitor:eDP-1
+workspace = 9, monitor:DP-2
+workspace = 10, monitor:DP-2
+workspace = 11, monitor:HDMI-A-1
+workspace = 12, monitor:HDMI-A-1
+
+workspace = 13, monitor:DP-1
+workspace = 14, monitor:eDP-1
+workspace = 15, monitor:DP-2
+workspace = 16, monitor:DP-2
+workspace = 17, monitor:HDMI-A-1
+workspace = 18, monitor:HDMI-A-1
+
+workspace = 19, monitor:DP-1
+workspace = 20, monitor:eDP-1
+workspace = 21, monitor:DP-2
+workspace = 22, monitor:DP-2
+workspace = 23, monitor:HDMI-A-1
+workspace = 24, monitor:HDMI-A-1
+
+bind = $mainMod, f1, exec, \
+hyprctl dispatch workspace 1; \
+hyprctl dispatch workspace 2; \
+hyprctl dispatch workspace 3; \
+hyprctl dispatch workspace 4; \
+hyprctl dispatch workspace 5; \
+hyprctl dispatch workspace 6
+
+bind = $mainMod, f2, exec, \
+hyprctl dispatch workspace 7; \
+hyprctl dispatch workspace 8; \
+hyprctl dispatch workspace 9; \
+hyprctl dispatch workspace 10; \
+hyprctl dispatch workspace 11; \
+hyprctl dispatch workspace 12
+
+bind = $mainMod, f3, exec, \
+hyprctl dispatch workspace 13; \
+hyprctl dispatch workspace 14; \
+hyprctl dispatch workspace 15; \
+hyprctl dispatch workspace 16; \
+hyprctl dispatch workspace 17; \
+hyprctl dispatch workspace 18
+
+bind = $mainMod, f4, exec, \
+hyprctl dispatch workspace 19; \
+hyprctl dispatch workspace 20; \
+hyprctl dispatch workspace 21; \
+hyprctl dispatch workspace 22; \
+hyprctl dispatch workspace 23; \
+hyprctl dispatch workspace 24
+

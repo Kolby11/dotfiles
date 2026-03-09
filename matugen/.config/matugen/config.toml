@@ -1,43 +1,34 @@
 [config]
-# Reload kitty after generating colors
-reload_apps = true
-reload_apps_list = ["starship", "kitty"]
+version_check = false
 
-[[custom_keywords]]
-name = "background"
-color = "background"
-
-[[custom_keywords]]
-name = "foreground"
-color = "on_background"
-
-[templates.quickshell]
-input_path = '~/.config/matugen/templates/matugen-quickshell.qml'
-output_path = '~/.config/quickshell/matugen-quickshell.qml'
-
-[templates.omp]
-input_path = '~/.config/matugen/templates/matugen-omp.json'
-output_path = '~/.config/omp/palette.json'
-post_hook = "bash ~/.config/matugen/scripts/merge-omp.sh"
-
-[templates.kitty]
-input_path = '~/.config/matugen/templates/matugen-kitty.conf'
-output_path = '~/.config/kitty/themes/Matugen.conf'
-post_hook = "kitty +kitten themes --reload-in=all Matugen"
+[templates.m3colors]
+input_path = '~/.config/matugen/templates/colors.json'
+output_path = '~/.local/state/quickshell/user/generated/colors.json'
 
 [templates.hyprland]
-input_path = '~/.config/matugen/templates/matugen-hyprland.conf'
-output_path = '~/.config/hypr/matugen/matugen-hyprland.conf'
+input_path = '~/.config/matugen/templates/hyprland/colors.conf'
+output_path = '~/.config/hypr/hyprland/colors.conf'
 
-[templates.spicetify]
-input_path = '~/.config/matugen/templates/matugen-spicetify.ini'
-output_path = '~/.config/spicetify/Themes/Comfy/color.ini'
+[templates.hyprlock]
+input_path = '~/.config/matugen/templates/hyprland/hyprlock-colors.conf'
+output_path = '~/.config/hypr/hyprlock/colors.conf'
 
-[templates.yazi]
-input_path = '~/.config/matugen/templates/matugen-yazi.conf'
-output_path = '~/.config/yazi/theme.toml'
+[templates.fuzzel]
+input_path = '~/.config/matugen/templates/fuzzel/fuzzel_theme.ini'
+output_path = '~/.config/fuzzel/fuzzel_theme.ini'
 
-[templates.vscode]
-input_path = '~/.config/matugen/templates/matugen-vscode.json'
-output_path = '~/.config/matugen/vscode-colors.json'
-post_hook = "bash ~/.config/matugen/scripts/merge-vscode.sh"
+[templates.gtk3]
+input_path = '~/.config/matugen/templates/gtk-3.0/gtk.css'
+output_path = '~/.config/gtk-3.0/gtk.css'
+
+[templates.gtk4]
+input_path = '~/.config/matugen/templates/gtk-4.0/gtk.css'
+output_path = '~/.config/gtk-4.0/gtk.css'
+
+[templates.kde_colors]
+input_path = '~/.config/matugen/templates/kde/color.txt'
+output_path = '~/.local/state/quickshell/user/generated/color.txt'
+
+[templates.wallpaper]
+input_path = '~/.config/matugen/templates/wallpaper.txt'
+output_path = '~/.local/state/quickshell/user/generated/wallpaper/path.txt'
