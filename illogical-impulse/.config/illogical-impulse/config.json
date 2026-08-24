@@ -31,7 +31,7 @@
     },
     "palette": {
       "accentColor": "",
-      "type": "scheme-expressive"
+      "type": "scheme-fidelity"
     },
     "transparency": {
       "automatic": true,
@@ -80,7 +80,7 @@
       "workspaceZoom": 1.07
     },
     "thumbnailPath": "",
-    "wallpaperPath": "/home/kolby/Pictures/Wallpapers/forest.jpg",
+    "wallpaperPath": "/home/kolby/Pictures/Wallpapers/red-horizon.jpg",
     "widgets": {
       "clock": {
         "cookie": {
