@@ -52,9 +52,9 @@ output_path = '~/.config/kitty/current-theme.conf'
 # invocation, and so unrelated processes are never signalled.
 post_hook = 'for kitty_pid in $(pgrep -x kitty); do kill -USR1 "$kitty_pid" 2>/dev/null || true; done'
 
-# ── VS Code / Material Code ─────────────────────────────────────────────────
-# Keep the JSONC settings file intact; merge-vscode.sh replaces only the
-# generated material-code.colors object after this fragment is rendered.
+# ── VS Code ──────────────────────────────────────────────────────────────────
+# Matugen owns the editor chrome, while Default Dark Modern remains the source
+# of syntax highlighting so code colors do not change with the wallpaper.
 [templates.vscode]
 input_path = '~/.config/matugen/templates/matugen-vscode.json'
 output_path = '~/.config/matugen/vscode-colors.json'
