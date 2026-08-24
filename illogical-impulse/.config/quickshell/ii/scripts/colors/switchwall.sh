@@ -15,6 +15,17 @@ if [[ ! -f "$upstream_script" ]]; then
     exit 1
 fi
 
+# Wallpaper selection is launched detached by QuickShell. Serialize it so
+# concurrent selections cannot race while writing Matugen output files or
+# sending terminal control sequences.
+runtime_dir="${XDG_RUNTIME_DIR:-/tmp}"
+lock_file="$runtime_dir/ii-switchwall.lock"
+exec 9>"$lock_file"
+if ! flock --exclusive --timeout 90 9; then
+    printf 'switchwall.sh: timed out waiting for another wallpaper switch\n' >&2
+    exit 1
+fi
+
 temporary_dir="$(mktemp -d "${TMPDIR:-/tmp}/ii-switchwall.XXXXXX")"
 cleanup() {
     rm -rf -- "$temporary_dir"
@@ -40,4 +51,7 @@ sed -i \
     's# && mv "\$SHELL_CONFIG_FILE.tmp" "\$SHELL_CONFIG_FILE"# \&\& cat "\$SHELL_CONFIG_FILE.tmp" > "\$SHELL_CONFIG_FILE" \&\& rm -f "\$SHELL_CONFIG_FILE.tmp"#g' \
     "$patched_script"
 
-exec bash "$patched_script" "$@"
+# The upstream helper broadcasts OSC color sequences to every /dev/pts. That
+# can interrupt Fish's line editor while a command is being typed. Keep its
+# generated files, but let Matugen's Kitty config hook perform the live reload.
+II_SKIP_LIVE_TERMINAL_APPLY=1 exec bash "$patched_script" "$@"

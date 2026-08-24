@@ -1,0 +1,14 @@
+/* Make Zen's built-in empty/new-tab surfaces reveal the desktop wallpaper. */
+@-moz-document url-prefix("about:blank"),
+               url-prefix("about:home"),
+               url-prefix("about:newtab"),
+               url-prefix("about:privatebrowsing") {
+    :root,
+    html,
+    body,
+    #root,
+    #content {
+        background: transparent !important;
+        background-color: transparent !important;
+    }
+}

@@ -1,11 +1,7 @@
 #!/usr/bin/env bash
 # Merge the matugen-generated palette.json into oh-my-posh's theme.json.
-# oh-my-posh re-reads its --config file on every prompt render, so the new
-# colors appear on the next prompt automatically — no reload signal needed.
-#
-# NOTE: do NOT `pkill -USR1 bash` here. matugen runs this as a child of
-# switchwall.sh (itself a bash process with no USR1 trap), so a broad
-# pkill would terminate the theming pipeline mid-run.
+# Interactive Fish checks the theme timestamp at command boundaries and
+# reloads the prompt safely before the next prompt is rendered.
 THEME="$HOME/.config/omp/theme.json"
 PALETTE="$HOME/.config/omp/palette.json"
 

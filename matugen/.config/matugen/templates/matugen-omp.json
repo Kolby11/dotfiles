@@ -1,7 +1,7 @@
 {
     "color_1": "{{colors.primary.default.hex}}",
     "color_2": "{{colors.secondary.default.hex}}",
-    "color_3": "{{colors.tertiary.default.hex}}",
+    "color_3": "{{colors.primary.default.hex}}",
     "color_4": "{{colors.primary_container.default.hex}}",
     "color_5": "{{colors.surface_container.default.hex}}",
     "color_fg": "{{colors.on_primary.default.hex}}",

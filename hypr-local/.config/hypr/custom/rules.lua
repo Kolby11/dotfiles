@@ -9,7 +9,13 @@ hl.layer_rule({
     xray = false,
 })
 
--- VS Code uses a compositor-level opacity rule to match Zen's translucent UI.
+-- Match the translucent treatment used by Zen. Kitty keeps its transparency
+-- inside kitty.conf, while VS Code needs a compositor-level opacity rule.
+hl.window_rule({
+    match = { class = "^zen$" },
+    opacity = "0.92 0.92 0.92 override",
+})
+
 hl.window_rule({
     match = { class = "^(code|Code)$" },
     opacity = "0.92 0.92 0.92 override",

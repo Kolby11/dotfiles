@@ -2,9 +2,8 @@
 
 export STARSHIP_CONFIG=~/.config/starship/starship.toml
 eval "$(oh-my-posh init bash --config ~/.config/omp/theme.json)"
-
-# Auto-reload oh-my-posh on SIGUSR1 (triggered by matugen)
-trap 'eval "$(oh-my-posh init bash --config ~/.config/omp/theme.json)"' USR1
+# Oh My Posh renders the Bash prompt through `print` for every prompt, so it
+# reads the newly merged palette without re-sourcing the shell.
 # eval "$(starship init bash)"
 
 eval "$(direnv hook bash)"

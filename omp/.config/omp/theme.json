@@ -1,20 +1,20 @@
 {
     "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
     "palette": {
-        "color_1": "#fcba66",
-        "color_2": "#a9cbe2",
-        "color_3": "#8ed1de",
-        "color_4": "#653e00",
-        "color_5": "#182122",
-        "color_fg": "#472a00",
-        "color_fg_dark": "#dae4e5",
-        "color_accent": "#8ed1de",
+        "color_1": "#bcc9c6",
+        "color_2": "#c3c7c5",
+        "color_3": "#bcc9c6",
+        "color_4": "#6b7875",
+        "color_5": "#1f201f",
+        "color_fg": "#273330",
+        "color_fg_dark": "#e4e2e1",
+        "color_accent": "#dac1ba",
         "color_warn": "#93000a",
         "color_error": "#ffb4ab",
-        "color_info": "#a9cbe2",
-        "color_success": "#fcba66",
-        "color_sep": "#a9cbe2",
-        "color_label": "#8ed1de"
+        "color_info": "#c3c7c5",
+        "color_success": "#bcc9c6",
+        "color_sep": "#c3c7c5",
+        "color_label": "#dac1ba"
     },
     "blocks": [
         {
@@ -27,7 +27,7 @@
                         "{{ if .Root }}p:color_error{{ end }}"
                     ],
                     "style": "plain",
-                    "template": "<{{ if .Root }}p:color_2{{ else }}p:color_3{{ end }}>\u250c\u2500\u2500(</>{{ .UserName }}{{ if .Root }}💀{{ else }}㉿{{ end }}{{ .HostName }}<{{ if .Root }}p:color_2{{ else }}p:color_3{{ end }}>)</>",
+                    "template": "<{{ if .Root }}p:color_2{{ else }}p:color_3{{ end }}>\u250c\u2500\u2500(</>{{ .UserName }}{{ if .Root }}\ud83d\udc80{{ else }}\u327f{{ end }}{{ .HostName }}<{{ if .Root }}p:color_2{{ else }}p:color_3{{ end }}>)</>",
                     "type": "session",
                     "options": {
                         "display_host": true
