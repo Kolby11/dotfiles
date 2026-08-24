@@ -33,6 +33,14 @@ output_path = '~/.local/state/quickshell/user/generated/color.txt'
 input_path = '~/.config/matugen/templates/wallpaper.txt'
 output_path = '~/.local/state/quickshell/user/generated/wallpaper/path.txt'
 
+# ── VS Code / Material Code ─────────────────────────────────────────────────
+# Keep the JSONC settings file intact; merge-vscode.sh replaces only the
+# generated material-code.colors object after this fragment is rendered.
+[templates.vscode]
+input_path = '~/.config/matugen/templates/matugen-vscode.json'
+output_path = '~/.config/matugen/vscode-colors.json'
+post_hook = 'bash "$HOME/.config/matugen/scripts/merge-vscode.sh" || true'
+
 # ── kitty ────────────────────────────────────────────────────────────────────
 # kitty.conf `include`s current-theme.conf; SIGUSR1 makes running kitties
 # live-reload their config. starship inherits its colors from this ANSI palette.

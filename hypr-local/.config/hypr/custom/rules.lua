@@ -8,3 +8,9 @@ hl.layer_rule({
     ignore_alpha = 0,
     xray = false,
 })
+
+-- VS Code uses a compositor-level opacity rule to match Zen's translucent UI.
+hl.window_rule({
+    match = { class = "^(code|Code)$" },
+    opacity = "0.92 0.92 0.92 override",
+})
