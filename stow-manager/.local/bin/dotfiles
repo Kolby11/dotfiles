@@ -1,0 +1,260 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage: dotfiles <command> [package ...]
+
+Commands:
+  apply      Restow local dotfiles (default)
+  check      Show what apply would change
+  update     Fast-forward this repository, then restow it
+  upstream-update
+             Clone/fast-forward End-4's dotfiles, then restow both layers
+  remove     Remove the selected dotfile symlinks
+  status     Show repository status and check Stow state
+  help       Show this help
+
+If no packages are given, every non-hidden top-level directory except the
+ignored hyprland-dotfiles vendor checkout is used.
+EOF
+}
+
+script_path=$(readlink -f "${BASH_SOURCE[0]}")
+repo_dir=$(git -C "$(dirname "$script_path")" rev-parse --show-toplevel)
+upstream_dir="${DOTFILES_UPSTREAM_DIR:-$repo_dir/hyprland-dotfiles}"
+upstream_url="${DOTFILES_UPSTREAM_URL:-https://github.com/end-4/dots-hyprland.git}"
+upstream_package_name=$(basename "$upstream_dir")
+command=${1:-apply}
+
+case "$command" in
+  apply|check|update|upstream-update|remove|status)
+    shift || true
+    ;;
+  help|-h|--help)
+    usage
+    exit 0
+    ;;
+  *)
+    printf 'Unknown command: %s\n\n' "$command" >&2
+    usage >&2
+    exit 2
+    ;;
+esac
+
+if ! command -v stow >/dev/null 2>&1; then
+  printf 'GNU Stow is required but was not found in PATH.\n' >&2
+  exit 1
+fi
+
+if (($#)); then
+  packages=("$@")
+else
+  mapfile -d '' packages < <(
+    find "$repo_dir" -mindepth 1 -maxdepth 1 -type d \
+      ! -name '.*' ! -name "$upstream_package_name" -printf '%f\0' | sort -z
+  )
+fi
+
+if ((${#packages[@]} == 0)); then
+  printf 'No Stow packages found in %s\n' "$repo_dir" >&2
+  exit 1
+fi
+
+for package in "${packages[@]}"; do
+  if [[ "$package" == "$upstream_package_name" ]]; then
+    printf 'The End-4 checkout is managed as the upstream layer, not a local Stow package: %s\n' "$package" >&2
+    exit 1
+  fi
+  if [[ ! -d "$repo_dir/$package" ]]; then
+    printf 'Unknown Stow package: %s\n' "$package" >&2
+    exit 1
+  fi
+done
+
+# Keep nested config directories real so the upstream and local layers can
+# coexist in the same directory (for example ~/.config/fish).
+stow_args=(--dir="$repo_dir" --target="$HOME" --no-folding)
+
+# These are the paths for which this repository is authoritative. End-4's
+# repository is still used for its upstream Hyprland defaults and supporting
+# shell files, but it must not replace personal application, prompt, or shell
+# settings.
+upstream_ignore_args=(
+  --ignore='^\.config/fish/config\.fish$'
+  --ignore='^\.config/(fontconfig|kitty|matugen|wlogout)(/|$)'
+  --ignore='^\.config/starship\.toml$'
+  --ignore='^\.config/illogical-impulse(/|$)'
+  --ignore='^\.config/quickshell/ii/scripts/colors/switchwall\.sh$'
+  --ignore='^\.config/hypr/custom/(env|general|execs|keybinds|rules|variables)\.lua$'
+  --ignore='^\.config/hypr/custom/scripts/__restore_video_wallpaper\.sh$'
+  --ignore='^\.local/share(/|$)'
+)
+
+is_upstream_ignored() {
+  case "$1" in
+    .config/fish/config.fish|.config/fontconfig/*|.config/kitty/*|.config/matugen/*|.config/wlogout/*|.config/starship.toml|.config/illogical-impulse/*|.config/quickshell/ii/scripts/colors/switchwall.sh|.config/hypr/custom/env.lua|.config/hypr/custom/general.lua|.config/hypr/custom/execs.lua|.config/hypr/custom/keybinds.lua|.config/hypr/custom/rules.lua|.config/hypr/custom/variables.lua|.config/hypr/custom/scripts/__restore_video_wallpaper.sh|.local/share/*)
+      return 0
+      ;;
+  esac
+  return 1
+}
+
+ensure_upstream_repository() {
+  if [[ ! -e "$upstream_dir" ]]; then
+    printf 'Cloning End-4 dotfiles into %s\n' "$upstream_dir"
+    git clone --recurse-submodules "$upstream_url" "$upstream_dir"
+  elif ! git -C "$upstream_dir" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    printf 'Expected %s to be a Git checkout of %s, but it is not.\n' \
+      "$upstream_dir" "$upstream_url" >&2
+    return 1
+  fi
+
+  if [[ -n $(git -C "$upstream_dir" status --porcelain) ]]; then
+    printf 'Refusing to pull End-4 dotfiles because %s has local changes.\n' \
+      "$upstream_dir" >&2
+    printf 'Move personal changes into this repository, then retry.\n' >&2
+    return 1
+  fi
+
+  # This is deliberately a real pull rather than a flake-input update. The
+  # Stow links point at this checkout, so the same upstream revision is used
+  # immediately by every Home Manager rebuild on this machine.
+  git -C "$upstream_dir" pull --ff-only --recurse-submodules
+  git -C "$upstream_dir" submodule update --init --recursive
+}
+
+prepare_upstream_targets() {
+  local backup_dir=''
+  local source relative target backup_target
+
+  while IFS= read -r -d '' source; do
+    relative="${source#"$upstream_dir/dots/"}"
+    is_upstream_ignored "$relative" && continue
+    target="$HOME/$relative"
+
+    if [[ -e "$target" || -L "$target" ]] &&
+      [[ "$(readlink -f "$target")" == "$(readlink -f "$source")" ]]; then
+      continue
+    fi
+
+    # The illogical-flake module used to copy regular files into $HOME. Move
+    # those files aside once, so Stow can take ownership without losing them.
+    # Personal paths are excluded above and are never moved by this function.
+    if [[ -f "$target" && ! -L "$target" ]] || [[ -L "$target" ]]; then
+      if [[ -z "$backup_dir" ]]; then
+        backup_dir=$(mktemp -d "$HOME/.config/dotfiles-backup.XXXXXX")
+        printf 'Backed up pre-Stow upstream files under %s\n' "$backup_dir"
+      fi
+      backup_target="$backup_dir/$relative"
+      mkdir -p "$(dirname "$backup_target")"
+      mv "$target" "$backup_target"
+    fi
+  done < <(find "$upstream_dir/dots" \( -type f -o -type l \) -print0)
+}
+
+stow_upstream() {
+  if [[ ! -d "$upstream_dir/dots" ]]; then
+    printf 'End-4 dotfiles checkout is missing its dots/ package: %s\n' "$upstream_dir" >&2
+    return 1
+  fi
+
+  prepare_upstream_targets
+  stow --dir="$upstream_dir" --target="$HOME" --no-folding \
+    "${upstream_ignore_args[@]}" --restow dots
+}
+
+prepare_local_targets() {
+  local backup_dir='' source relative target backup_target
+
+  for package in "${packages[@]}"; do
+    while IFS= read -r -d '' source; do
+      relative="${source#"$repo_dir/$package/"}"
+      target="$HOME/$relative"
+
+      if [[ -e "$target" || -L "$target" ]] &&
+        [[ "$(readlink -f "$target")" == "$(readlink -f "$source")" ]]; then
+        continue
+      fi
+
+      if [[ -f "$target" && ! -L "$target" ]]; then
+        if cmp -s "$source" "$target"; then
+          rm -f "$target"
+        else
+          if [[ -z "$backup_dir" ]]; then
+            backup_dir=$(mktemp -d "$HOME/.config/dotfiles-local-backup.XXXXXX")
+            printf 'Backed up pre-Stow local files under %s\n' "$backup_dir"
+          fi
+          backup_target="$backup_dir/$relative"
+          mkdir -p "$(dirname "$backup_target")"
+          mv "$target" "$backup_target"
+        fi
+        # Link immediately after moving the regular file. Some desktop
+        # services recreate their JSON config as soon as it disappears; the
+        # link prevents that race before Stow performs its conflict check.
+        ln -s --relative "$source" "$target"
+      elif [[ -L "$target" ]]; then
+        if [[ -z "$backup_dir" ]]; then
+          backup_dir=$(mktemp -d "$HOME/.config/dotfiles-local-backup.XXXXXX")
+          printf 'Backed up pre-Stow local links under %s\n' "$backup_dir"
+        fi
+        backup_target="$backup_dir/$relative"
+        mkdir -p "$(dirname "$backup_target")"
+        mv "$target" "$backup_target"
+        ln -s --relative "$source" "$target"
+      fi
+    done < <(find "$repo_dir/$package" -type f -print0)
+  done
+}
+
+stow_local() {
+  prepare_local_targets
+  stow "${stow_args[@]}" --restow "${packages[@]}"
+}
+
+case "$command" in
+  apply)
+    if [[ -d "$upstream_dir/dots" ]]; then
+      stow_upstream
+    fi
+    stow_local
+    ;;
+  check)
+    if [[ -d "$upstream_dir/dots" ]]; then
+      stow --dir="$upstream_dir" --target="$HOME" --no-folding \
+        "${upstream_ignore_args[@]}" --simulate --verbose=1 --restow dots
+    fi
+    stow "${stow_args[@]}" --simulate --verbose=1 --restow "${packages[@]}"
+    ;;
+  update)
+    if [[ -n $(git -C "$repo_dir" status --porcelain) ]]; then
+      printf 'Refusing to pull because the dotfiles repository has local changes.\n' >&2
+      printf 'Commit or stash them first; use "dotfiles apply" to deploy them as-is.\n' >&2
+      exit 1
+    fi
+    git -C "$repo_dir" pull --ff-only
+    stow_local
+    ;;
+  upstream-update)
+    ensure_upstream_repository
+    stow_upstream
+    stow_local
+    ;;
+  remove)
+    stow "${stow_args[@]}" --delete "${packages[@]}"
+    ;;
+  status)
+    git -C "$repo_dir" status --short
+    if [[ -d "$upstream_dir/.git" || -f "$upstream_dir/.git" ]]; then
+      git -C "$upstream_dir" status --short --branch
+    else
+      printf 'End-4 dotfiles are not cloned yet: %s\n' "$upstream_dir"
+    fi
+    if [[ -d "$upstream_dir/dots" ]]; then
+      stow --dir="$upstream_dir" --target="$HOME" --no-folding \
+        "${upstream_ignore_args[@]}" --simulate --verbose=1 --restow dots
+    fi
+    stow "${stow_args[@]}" --simulate --verbose=1 --restow "${packages[@]}"
+    ;;
+esac

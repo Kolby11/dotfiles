@@ -1,185 +1,248 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
+# ═══════════════════════════════════════════════════════════════════════════
+#  Starship — riced powerline prompt.
+#  Segment colors reference ANSI slots (blue/cyan/green/yellow/purple/red),
+#  which your kitty matugen theme fills from the wallpaper — so the prompt
+#  automatically matches whatever colorscheme is active.
+# ═══════════════════════════════════════════════════════════════════════════
+
+add_newline = true
 palette = "matugen"
 
 format = """
-[](color_1)\
+[](fg:seg_os)\
 $os\
 $username\
-[](bg:color_2 fg:color_1)\
+[](fg:seg_os bg:seg_dir)\
 $directory\
-[](fg:color_2 bg:color_3)\
+[](fg:seg_dir bg:seg_git)\
 $git_branch\
 $git_status\
-[](fg:color_3 bg:color_4)\
-$c\
-$cpp\
-$rust\
-$golang\
-$nodejs\
-$php\
-$java\
-$kotlin\
-$haskell\
-$python\
-[](fg:color_4 bg:color_5)\
-$docker_context\
-$conda\
-$pixi\
-[](fg:color_5 bg:color_6)\
-$time\
-[ ](fg:color_6)\
-$line_break$character"""
+$git_state\
+[](fg:seg_git bg:seg_lang)\
+${custom.langsep}\
+$nodejs$python$rust$golang$c$java$kotlin$php$haskell$lua$ruby$nix_shell$package\
+[](fg:seg_lang bg:seg_ctx)\
+$docker_context$kubernetes\
+[](fg:seg_ctx)\
+$fill\
+$cmd_duration$jobs$battery$time\
+$line_break\
+$character"""
 
+# ── Palette: semantic names → ANSI slots (matugen-controlled) ────────────────
+[palettes.matugen]
+seg_os   = "blue"
+seg_dir  = "cyan"
+seg_git  = "green"
+seg_lang = "yellow"
+seg_ctx  = "purple"
+ink      = "black"       # dark text that sits on the light pastel segments
+muted    = "bright-black"
+good     = "green"
+bad      = "red"
+warn     = "yellow"
 
+# ── OS / user block ──────────────────────────────────────────────────────────
 [os]
 disabled = false
-style = "bg:color_1 fg:color_text_dark"
+style = "fg:ink bg:seg_os"
+format = "[ $symbol ]($style)"
 
 [os.symbols]
+NixOS = ""
+Arch = ""
+Debian = ""
+Ubuntu = ""
+Fedora = ""
+Macos = ""
 Windows = ""
-Ubuntu = "󰕈"
-SUSE = ""
-Raspbian = "󰐿"
-Mint = "󰣭"
-Macos = "󰀵"
-Manjaro = ""
-Linux = "󰌽"
-Gentoo = "󰣨"
-Fedora = "󰣛"
-Alpine = ""
-Amazon = ""
-Android = ""
-Arch = "󰣇"
-Artix = "󰣇"
-CentOS = ""
-Debian = "󰣚"
-Redhat = "󱄛"
-RedHatEnterprise = "󱄛"
+Linux = ""
 
 [username]
 show_always = true
-style_user = "bg:color_1 fg:color_text_dark"
-style_root = "bg:color_1 fg:color_text_dark"
-format = '[ $user]($style)'
+style_user = "fg:ink bg:seg_os"
+style_root = "fg:bad bg:seg_os bold"
+format = "[$user ]($style)"
 
+[hostname]
+ssh_only = true
+style = "fg:ink bg:seg_os"
+format = "[@$hostname ]($style)"
+
+# ── Directory ────────────────────────────────────────────────────────────────
 [directory]
-style = "bg:color_2 fg:color_text_dark"
-format = "[ $path ]($style)"
+style = "fg:ink bg:seg_dir"
+format = "[ $path ]($style)[$read_only]($read_only_style)"
 truncation_length = 3
 truncation_symbol = "…/"
+truncate_to_repo = true
+home_symbol = " "
+read_only = " "
+read_only_style = "fg:bad bg:seg_dir"
 
 [directory.substitutions]
 "Documents" = "󰈙 "
 "Downloads" = " "
-"Music" = "󰝚 "
-"Pictures" = " "
-"Developer" = "󰲋 "
+"Music"     = "󰎈 "
+"Pictures"  = " "
+"Videos"    = " "
+"Desktop"   = " "
+".config"   = " "
+"GitHub"    = " "
+"~/.config/nixos" = "󱄅 nixos"
 
+# ── Git ──────────────────────────────────────────────────────────────────────
 [git_branch]
-symbol = ""
-style = "bg:color_3"
-format = '[[ $symbol $branch ](fg:color_text_dark bg:color_3)]($style)'
+symbol = " "
+style = "fg:ink bg:seg_git"
+format = "[ $symbol$branch ]($style)"
+truncation_length = 20
+truncation_symbol = "…"
 
 [git_status]
-style = "bg:color_3"
-format = '[[($all_status$ahead_behind )](fg:color_text_dark bg:color_3)]($style)'
+style = "fg:ink bg:seg_git"
+format = "[$all_status$ahead_behind]($style)"
+conflicted = "󰞇 "
+ahead = "⇡${count} "
+behind = "⇣${count} "
+diverged = "⇕⇡${ahead_count}⇣${behind_count} "
+up_to_date = ""
+untracked = "?${count} "
+stashed = " ${count} "
+modified = "!${count} "
+staged = "+${count} "
+renamed = "»${count} "
+deleted = "✘${count} "
+
+[git_state]
+style = "fg:bad bg:seg_git"
+format = '[ \($state $progress_current/$progress_total\)]($style)'
+rebase = "REBASE"
+merge = "MERGE"
+revert = "REVERT"
+cherry_pick = " PICK"
+bisect = "BISECT"
+
+# ── Language / runtime segment ───────────────────────────────────────────────
+[custom.langsep]
+when = true
+format = "[ ](fg:ink bg:seg_lang)"
 
 [nodejs]
-symbol = ""
-style = "bg:color_4"
-format = '[[ $symbol( $version) ](fg:color_text_light bg:color_4)]($style)'
+symbol = " "
+style = "fg:ink bg:seg_lang"
+format = "[$symbol($version) ]($style)"
+
+[python]
+symbol = " "
+style = "fg:ink bg:seg_lang"
+format = '[$symbol(${version})(\($virtualenv\)) ]($style)'
+
+[rust]
+symbol = " "
+style = "fg:ink bg:seg_lang"
+format = "[$symbol($version) ]($style)"
+
+[golang]
+symbol = " "
+style = "fg:ink bg:seg_lang"
+format = "[$symbol($version) ]($style)"
 
 [c]
 symbol = " "
-style = "bg:color_4"
-format = '[[ $symbol( $version) ](fg:color_text_light bg:color_4)]($style)'
-
-[rust]
-symbol = ""
-style = "bg:color_4"
-format = '[[ $symbol( $version) ](fg:color_text_light bg:color_4)]($style)'
-
-[golang]
-symbol = ""
-style = "bg:color_4"
-format = '[[ $symbol( $version) ](fg:color_text_light bg:color_4)]($style)'
-
-[php]
-symbol = ""
-style = "bg:color_4"
-format = '[[ $symbol( $version) ](fg:color_text_light bg:color_4)]($style)'
+style = "fg:ink bg:seg_lang"
+format = "[$symbol($version) ]($style)"
 
 [java]
 symbol = " "
-style = "bg:color_4"
-format = '[[ $symbol( $version) ](fg:color_text_light bg:color_4)]($style)'
+style = "fg:ink bg:seg_lang"
+format = "[$symbol($version) ]($style)"
 
 [kotlin]
-symbol = ""
-style = "bg:color_4"
-format = '[[ $symbol( $version) ](fg:color_text_light bg:color_4)]($style)'
+symbol = " "
+style = "fg:ink bg:seg_lang"
+format = "[$symbol($version) ]($style)"
+
+[php]
+symbol = " "
+style = "fg:ink bg:seg_lang"
+format = "[$symbol($version) ]($style)"
 
 [haskell]
-symbol = ""
-style = "bg:color_4"
-format = '[[ $symbol( $version) ](fg:color_text_light bg:color_4)]($style)'
+symbol = " "
+style = "fg:ink bg:seg_lang"
+format = "[$symbol($version) ]($style)"
 
-[python]
-symbol = ""
-style = "bg:color_4"
-format = '[[ $symbol( $version)(\($virtualenv\)) ](fg:color_text_light bg:color_4)]($style)'
+[lua]
+symbol = " "
+style = "fg:ink bg:seg_lang"
+format = "[$symbol($version) ]($style)"
 
+[ruby]
+symbol = " "
+style = "fg:ink bg:seg_lang"
+format = "[$symbol($version) ]($style)"
+
+[nix_shell]
+symbol = "󱄅 "
+style = "fg:ink bg:seg_lang"
+format = "[$symbol$state( $name) ]($style)"
+impure_msg = "impure"
+pure_msg = "pure"
+
+[package]
+disabled = true
+
+# ── Context segment (docker / k8s) ──────────────────────────────────────────
 [docker_context]
-symbol = ""
-style = "bg:color_5"
-format = '[[ $symbol( $context) ](fg:color_text_light bg:color_5)]($style)'
+symbol = " "
+style = "fg:ink bg:seg_ctx"
+format = "[ $symbol$context ]($style)"
+only_with_files = true
 
-[conda]
-symbol = "  "
-style = "fg:color_text_light bg:color_5"
-format = '[$symbol$environment ]($style)'
-ignore_base = false
+[kubernetes]
+disabled = false
+symbol = "󱃾 "
+style = "fg:ink bg:seg_ctx"
+format = "[ $symbol$context ]($style)"
 
-[pixi]
-style = "fg:color_text_light bg:color_5"
-format = '[[ $symbol( $version)( $environment) ](fg:color_text_light bg:color_5)]($style)'
+# ── Fill + right side ────────────────────────────────────────────────────────
+[fill]
+symbol = " "
+
+[cmd_duration]
+min_time = 500
+style = "fg:warn"
+format = "[󰔟 $duration ]($style)"
+show_milliseconds = false
+
+[jobs]
+symbol = " "
+style = "fg:seg_ctx"
+format = "[$symbol$number ]($style)"
+number_threshold = 1
+
+[battery]
+format = "[$symbol$percentage ]($style)"
+[[battery.display]]
+threshold = 15
+style = "fg:bad"
+[[battery.display]]
+threshold = 40
+style = "fg:warn"
 
 [time]
 disabled = false
 time_format = "%R"
-style = "bg:color_6"
-format = '[[  $time ](fg:color_text_light bg:color_6)]($style)'
+style = "fg:muted"
+format = "[  $time ]($style)"
 
-[line_break]
-disabled = true
-
+# ── Prompt character (line 2) ────────────────────────────────────────────────
 [character]
-disabled = false
-success_symbol = '[❯](bold fg:color_success)'
-error_symbol = '[❯](bold fg:color_error)'
-vimcmd_symbol = '[❮](bold fg:color_success)'
-vimcmd_replace_one_symbol = '[❮](bold fg:color_3)'
-vimcmd_replace_symbol = '[❮](bold fg:color_3)'
-vimcmd_visual_symbol = '[❮](bold fg:color_2)'
-
-[cmd_duration]
-show_milliseconds = true
-format = " in $duration "
-disabled = false
-show_notifications = true
-min_time_to_notify = 45000
-
-[palettes.matugen]
-color_1 = '#80d5d3'
-color_2 = '#b0ccca'
-color_3 = '#b2c8e8'
-color_4 = '#00504f'
-color_5 = '#324b4a'
-color_6 = '#334863'
-color_bg = '#0e1514'
-color_fg = '#dde4e3'
-color_text_dark = '#003736'
-color_text_light = '#9cf1ef'
-color_error = '#ffb4ab'
-color_success = '#80d5d3'
+success_symbol = "[❯](bold good)"
+error_symbol = "[❯](bold bad)"
+vimcmd_symbol = "[❮](bold seg_git)"
+vimcmd_replace_symbol = "[❮](bold seg_ctx)"
+vimcmd_visual_symbol = "[❮](bold warn)"

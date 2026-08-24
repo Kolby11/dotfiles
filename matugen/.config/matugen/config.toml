@@ -32,3 +32,23 @@ output_path = '~/.local/state/quickshell/user/generated/color.txt'
 [templates.wallpaper]
 input_path = '~/.config/matugen/templates/wallpaper.txt'
 output_path = '~/.local/state/quickshell/user/generated/wallpaper/path.txt'
+
+# ── kitty ────────────────────────────────────────────────────────────────────
+# kitty.conf `include`s current-theme.conf; SIGUSR1 makes running kitties
+# live-reload their config. starship inherits its colors from this ANSI palette.
+[templates.kitty]
+input_path = '~/.config/matugen/templates/matugen-kitty.conf'
+output_path = '~/.config/kitty/current-theme.conf'
+post_hook = 'kill -SIGUSR1 $(pidof kitty) 2>/dev/null || true'
+
+# ── oh-my-posh (active bash + fish prompt) ───────────────────────────────────
+# Generate palette.json, then merge-omp.sh injects it into theme.json and
+# signals bash (trap in .bashrc) to re-init the prompt. fish re-reads per prompt.
+[templates.omp]
+input_path = '~/.config/matugen/templates/matugen-omp.json'
+output_path = '~/.config/omp/palette.json'
+post_hook = 'bash "$HOME/.config/matugen/scripts/merge-omp.sh" || true'
+
+# Note: VS Code is intentionally NOT wired in. Its settings.json is JSONC
+# (comments + CRLF), so any json round-trip merge would strip the user's
+# comments and reformatting. The material-code extension is left unthemed.

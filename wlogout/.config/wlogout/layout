@@ -1,14 +1,14 @@
 {
-    "label" : "lock",
-    "action" : "loginctl lock-session",
-    "text" : "lock",
-    "keybind" : "l"
-}
-{
     "label" : "hibernate",
     "action" : "systemctl hibernate || loginctl hibernate",
     "text" : "downloading",
     "keybind" : "h"
+}
+{
+    "label" : "lock",
+    "action" : "loginctl lock-session",
+    "text" : "lock",
+    "keybind" : "l"
 }
 {
     "label" : "logout",
