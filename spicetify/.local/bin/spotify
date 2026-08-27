@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+config_dir="${SPICETIFY_CONFIG:-$HOME/.config/spicetify}"
+mutable_dir="${SPICETIFY_MUTABLE_DIR:-$HOME/.local/share/spotify-spicetify}"
+
+# The raw Nix package remains the source of the unmodified Spotify payload.
+# Its launcher also carries the complete Nix runtime library environment, so
+# reuse it after redirecting only the final executable to the writable copy.
+profile_launcher="${SPOTIFY_PROFILE_LAUNCHER:-$HOME/.nix-profile/bin/spotify}"
+profile_launcher="$(readlink -f "$profile_launcher")"
+profile_share="$(cd "$(dirname "$profile_launcher")" && pwd)"
+source_dir="$profile_share"
+
+spotify_running() {
+    local pid state
+    while read -r pid; do
+        state="$(ps -o stat= -p "$pid" 2>/dev/null || true)"
+        [[ "$state" != Z* ]] && return 0
+    done < <(pgrep -f "$mutable_dir/.spotify-wrapped" || true)
+    return 1
+}
+
+if [[ ! -x "$source_dir/.spotify-wrapped" ]]; then
+    printf 'spotify: raw Spotify payload not found at %s\n' "$source_dir" >&2
+    exit 1
+fi
+
+mkdir -p "$(dirname "$mutable_dir")"
+marker="$mutable_dir/.spicetify-nix-source"
+source_id="$source_dir/.spotify-wrapped"
+needs_apply=0
+
+if [[ ! -x "$mutable_dir/.spotify-wrapped" || ! -f "$marker" || "$(<"$marker")" != "$source_id" ]]; then
+    replacement="${mutable_dir}.new.$$"
+    rm -rf "$replacement"
+    mkdir -p "$replacement"
+    cp -a "$source_dir/." "$replacement/"
+    # Nix store files are read-only; Spicetify modifies this copy in place.
+    chmod -R u+w "$replacement"
+    printf '%s\n' "$source_id" > "$replacement/.spicetify-nix-source"
+    if [[ -e "$mutable_dir" ]]; then
+        mv "$mutable_dir" "${mutable_dir}.old.$$"
+    fi
+    mv "$replacement" "$mutable_dir"
+    needs_apply=1
+fi
+
+export SPICETIFY_CONFIG="$config_dir"
+
+# A failed Chromium start can leave these links behind even after the process
+# is gone. Remove only stale Spotify links; never touch them while our client
+# is still running.
+if ! spotify_running; then
+    stale_socket=""
+    if [[ -L "$HOME/.cache/spotify/SingletonSocket" ]]; then
+        stale_socket="$(readlink -f "$HOME/.cache/spotify/SingletonSocket" 2>/dev/null || true)"
+    fi
+    for singleton in "$HOME/.cache/spotify/SingletonLock" \
+        "$HOME/.cache/spotify/SingletonSocket" \
+        "$HOME/.cache/spotify/SingletonCookie"; do
+        [[ -L "$singleton" ]] && unlink "$singleton"
+    done
+    [[ -S "$stale_socket" ]] && unlink "$stale_socket"
+fi
+
+if ! command -v spicetify >/dev/null 2>&1; then
+    printf 'spotify: spicetify-cli is not on PATH\n' >&2
+    exit 1
+fi
+
+# A newly copied Spotify version needs one initial patch. Existing launches
+# use the already-patched writable tree so startup stays reliable and quick.
+if (( needs_apply )); then
+    spicetify backup apply >/tmp/spicetify-apply.log 2>&1 || {
+        cat /tmp/spicetify-apply.log >&2
+        exit 1
+    }
+fi
+
+# Register a slightly lighter compositor opacity for Spotify before its
+# XWayland window is created. 0.85 causes continuous repainting in this
+# Chromium/XWayland client; 0.90 keeps the translucent look without the lag.
+if command -v hyprctl >/dev/null 2>&1; then
+    hyprctl eval \
+        'hl.window_rule({match = {class = "^Spotify$"}, opacity = "0.90 0.90 0.90 override"})' \
+        >/dev/null 2>&1 || true
+fi
+
+launcher_tmp="$(mktemp "${TMPDIR:-/tmp}/spotify-launcher.XXXXXX")"
+cleanup() { rm -f "$launcher_tmp"; }
+trap cleanup EXIT
+
+# Redirect the raw wrapper's hard-coded store Spotify path to our writable
+# patched payload while retaining its Nix-provided runtime library paths.
+sed "s|$profile_share|$mutable_dir|g" "$profile_launcher" > "$launcher_tmp"
+chmod +x "$launcher_tmp"
+exec "$launcher_tmp" \
+    --user-data-dir="$HOME/.cache/spotify-spicetify" \
+    --disable-gpu-sandbox \
+    "$@"

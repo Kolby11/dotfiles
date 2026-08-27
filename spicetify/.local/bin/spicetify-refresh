@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+export SPICETIFY_CONFIG="${SPICETIFY_CONFIG:-$HOME/.config/spicetify}"
+
+if ! command -v spicetify >/dev/null 2>&1; then
+    exit 0
+fi
+
+spotify_running() {
+    local pid state
+    while read -r pid; do
+        state="$(ps -o stat= -p "$pid" 2>/dev/null || true)"
+        [[ "$state" != Z* ]] && return 0
+    done < <(pgrep -f "$HOME/.local/share/spotify-spicetify/.spotify-wrapped" || true)
+    return 1
+}
+
+spicetify restore backup apply >/tmp/spicetify-apply.log 2>&1 || {
+    cat /tmp/spicetify-apply.log >&2
+    exit 0
+}
+
+# The mutable Spotify process watches the patched xpui bundle poorly; restart
+# the exact process started by our launcher so a new Matugen palette is visible
+# immediately. Spicetify's built-in restart does not recognize this wrapper.
+mapfile -t spotify_pids < <(pgrep -f "$HOME/.local/share/spotify-spicetify/.spotify-wrapped" || true)
+if ((${#spotify_pids[@]})); then
+    for pid in "${spotify_pids[@]}"; do
+        kill -TERM "$pid" 2>/dev/null || true
+    done
+    sleep 1
+    for pid in "${spotify_pids[@]}"; do
+        kill -KILL "$pid" 2>/dev/null || true
+    done
+    for _ in {1..10}; do
+        spotify_running || break
+        sleep 1
+    done
+    # Close fds this script may have inherited before spawning a long-lived
+    # Spotify. When invoked from a Matugen post_hook inside switchwall.sh, fd 9
+    # is switchwall's `flock` lock: a Spotify that keeps it open holds the
+    # wallpaper-switch lock forever ("timed out waiting for another wallpaper
+    # switch"). setsid + 9>&- detaches it cleanly.
+    setsid nohup "$HOME/.local/bin/spotify" \
+        >/tmp/spotify-launch.log 2>&1 </dev/null 9>&- &
+fi

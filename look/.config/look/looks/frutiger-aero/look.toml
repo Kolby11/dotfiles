@@ -1,0 +1,16 @@
+name = "Frutiger Aero"
+description = "Liquid glass (Liquify) with an aqua-and-lime Frutiger Aero tint."
+
+# Palette still comes from Matugen. A bright aqua / nature wallpaper makes the
+# generated hues match the aesthetic. Drop an image at the path in
+# wallpaper.txt (any aspect); if the file is missing the current wallpaper is
+# kept and only the form layer changes.
+# scheme = "scheme-expressive"
+mode = "dark"   # gsettings color-scheme is unset on this host; pin it explicitly
+
+# Use the vendored Liquify Spicetify theme (Themes/Liquify). Its glass
+# structure is hue-neutral; matugen/matugen-liquify.css tints it per wallpaper.
+# Liquify's own settings panel (gear icon in Spotify) controls the background
+# image, blur and transparency.
+spicetify_theme        = "Liquify"
+spicetify_color_scheme = "Base"

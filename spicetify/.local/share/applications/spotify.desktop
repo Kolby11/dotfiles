@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Spotify
+Comment=Music and podcasts
+Exec=/home/kolby/.local/bin/spotify %U
+TryExec=/home/kolby/.local/bin/spotify
+Icon=spotify
+Terminal=false
+Type=Application
+Categories=Audio;AudioVideo;Player;Music;
+MimeType=x-scheme-handler/spotify;
+StartupWMClass=Spotify

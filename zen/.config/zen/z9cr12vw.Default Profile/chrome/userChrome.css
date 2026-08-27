@@ -8,53 +8,53 @@
 @import url("zen-matugen.css");
 
 :root {
-    /* Match Kitty's 0.78 window opacity while keeping Zen controls readable. */
-    /* Use a darker, more opaque content surface so bright wallpaper does not
+  /* Match Kitty's 0.78 window opacity while keeping Zen controls readable. */
+  /* Use a darker, more opaque content surface so bright wallpaper does not
      * wash out the page while the Matugen palette remains visible. */
-    --zen-matugen-main-surface: color-mix(in srgb, var(--matugen-surface) 96%, transparent) !important;
-    --zen-matugen-ui-surface: var(--matugen-surface) !important;
-    --zen-matugen-search-surface: var(--matugen-surface) !important;
+  --zen-matugen-main-surface: color-mix(in srgb, var(--matugen-surface) 96%, transparent) !important;
+  --zen-matugen-ui-surface: var(--matugen-surface) !important;
+  --zen-matugen-search-surface: var(--matugen-surface) !important;
 
-    /* Zen's public theme variables. */
-    --zen-primary-color: var(--matugen-primary) !important;
-    --zen-main-browser-background: var(--zen-matugen-main-surface) !important;
-    --zen-colors-primary: var(--matugen-primary) !important;
-    --zen-colors-secondary: var(--matugen-secondary) !important;
-    --zen-colors-tertiary: var(--matugen-surface) !important;
-    --zen-colors-border: var(--matugen-primary) !important;
-        --zen-themed-toolbar-bg: var(--zen-matugen-ui-surface) !important;
-        --zen-themed-toolbar-bg-transparent: transparent !important;
-        --zen-navigator-toolbox-background: var(--zen-matugen-ui-surface) !important;
-        --toolbox-bgcolor-inactive: var(--zen-matugen-ui-surface) !important;
+  /* Zen's public theme variables. */
+  --zen-primary-color: var(--matugen-primary) !important;
+  --zen-main-browser-background: var(--zen-matugen-main-surface) !important;
+  --zen-colors-primary: var(--matugen-primary) !important;
+  --zen-colors-secondary: var(--matugen-secondary) !important;
+  --zen-colors-tertiary: var(--matugen-surface) !important;
+  --zen-colors-border: var(--matugen-primary) !important;
+  --zen-themed-toolbar-bg: var(--zen-matugen-ui-surface) !important;
+  --zen-themed-toolbar-bg-transparent: transparent !important;
+  --zen-navigator-toolbox-background: var(--zen-matugen-ui-surface) !important;
+  --toolbox-bgcolor-inactive: var(--zen-matugen-ui-surface) !important;
 
-        /* Zen draws the large empty-page panel with these background layers. */
-        --zen-main-browser-background-old: var(--zen-matugen-main-surface) !important;
-        --zen-main-browser-background-toolbar: var(--zen-matugen-ui-surface) !important;
-        --zen-main-browser-background-toolbar-old: var(--zen-matugen-ui-surface) !important;
+  /* Zen draws the large empty-page panel with these background layers. */
+  --zen-main-browser-background-old: var(--zen-matugen-main-surface) !important;
+  --zen-main-browser-background-toolbar: var(--zen-matugen-ui-surface) !important;
+  --zen-main-browser-background-toolbar-old: var(--zen-matugen-ui-surface) !important;
 
-    /* Firefox toolbar variables used by Zen's browser chrome. */
-    --toolbarbutton-icon-fill: var(--matugen-primary) !important;
-    --lwt-accent-color: var(--matugen-surface-container) !important;
-    --toolbar-bgcolor: var(--zen-matugen-ui-surface) !important;
-    --toolbar-color: var(--matugen-on-surface) !important;
-    --lwt-text-color: var(--matugen-on-surface) !important;
-    --toolbar-field-color: var(--matugen-on-surface) !important;
-    --toolbar-field-focus-color: var(--matugen-on-surface) !important;
-    --tab-selected-textcolor: var(--matugen-on-surface) !important;
-    --newtab-text-primary-color: var(--matugen-on-surface) !important;
-    --arrowpanel-color: var(--matugen-on-surface) !important;
-    --arrowpanel-background: var(--matugen-surface-container-high) !important;
-    --sidebar-text-color: var(--matugen-on-surface) !important;
-    --lwt-sidebar-text-color: var(--matugen-on-surface) !important;
-    --lwt-sidebar-background-color: var(--zen-matugen-ui-surface) !important;
-    --newtab-background-color: transparent !important;
+  /* Firefox toolbar variables used by Zen's browser chrome. */
+  --toolbarbutton-icon-fill: var(--matugen-primary) !important;
+  --lwt-accent-color: var(--matugen-surface-container) !important;
+  --toolbar-bgcolor: var(--zen-matugen-ui-surface) !important;
+  --toolbar-color: var(--matugen-on-surface) !important;
+  --lwt-text-color: var(--matugen-on-surface) !important;
+  --toolbar-field-color: var(--matugen-on-surface) !important;
+  --toolbar-field-focus-color: var(--matugen-on-surface) !important;
+  --tab-selected-textcolor: var(--matugen-on-surface) !important;
+  --newtab-text-primary-color: var(--matugen-on-surface) !important;
+  --arrowpanel-color: var(--matugen-on-surface) !important;
+  --arrowpanel-background: var(--matugen-surface-container-high) !important;
+  --sidebar-text-color: var(--matugen-on-surface) !important;
+  ]--lwt-sidebar-text-color: var(--matugen-on-surface) !important;
+  --lwt-sidebar-background-color: var(--zen-matugen-ui-surface) !important;
+  --newtab-background-color: transparent !important;
 
-    /* Zen has a separate URL-bar background stack. Keep every layer on the
+  /* Zen has a separate URL-bar background stack. Keep every layer on the
      * same Kitty-like translucent base instead of the default opaque gray. */
-    --zen-urlbar-background: var(--zen-matugen-search-surface) !important;
-    --zen-urlbar-background-base: var(--zen-matugen-search-surface) !important;
-    --zen-urlbar-background-transparent: var(--zen-matugen-search-surface) !important;
-    --zen-toolbar-element-bg: var(--zen-matugen-ui-surface) !important;
+  --zen-urlbar-background: var(--zen-matugen-search-surface) !important;
+  --zen-urlbar-background-base: var(--zen-matugen-search-surface) !important;
+  --zen-urlbar-background-transparent: var(--zen-matugen-search-surface) !important;
+  --zen-toolbar-element-bg: var(--zen-matugen-ui-surface) !important;
 }
 
 /* Keep the main chrome and sidebar in the wallpaper-derived surface family. */
@@ -63,10 +63,10 @@
 #navigator-toolbox,
 #zen-appcontent-navbar-container,
 #zen-sidebar-top-buttons,
-    #zen-sidebar-bottom-buttons,
-    #zen-sidebar-foot-buttons,
-    #sidebar-box,
-    #zen-tabs-wrapper,
+#zen-sidebar-bottom-buttons,
+#zen-sidebar-foot-buttons,
+#sidebar-box,
+#zen-tabs-wrapper,
 #zen-workspaces-button,
 #tabbrowser-tabs,
 #tabbrowser-arrowscrollbox,
@@ -74,10 +74,10 @@
 #zen-essentials,
 #zen-current-workspace-indicator-container,
 .sidebar-placesTree {
-    background: var(--zen-matugen-ui-surface) !important;
-    background-color: var(--zen-matugen-ui-surface) !important;
-    background-image: none !important;
-    color: var(--matugen-on-surface) !important;
+  background: var(--zen-matugen-ui-surface) !important;
+  background-color: var(--zen-matugen-ui-surface) !important;
+  background-image: none !important;
+  color: var(--matugen-on-surface) !important;
 }
 
 #urlbar,
@@ -85,24 +85,24 @@
 .urlbar-background,
 #urlbar-input-container,
 #searchbar {
-    background: var(--zen-matugen-search-surface) !important;
-    background-color: var(--zen-matugen-search-surface) !important;
-    background-image: none !important;
-    color: var(--matugen-on-surface) !important;
+  background: var(--zen-matugen-search-surface) !important;
+  background-color: var(--zen-matugen-search-surface) !important;
+  background-image: none !important;
+  color: var(--matugen-on-surface) !important;
 }
 
 .content-shortcuts,
 #zenEditBookmarkPanelFaviconContainer {
-    background-color: var(--matugen-surface-container-high) !important;
-    border-color: var(--matugen-primary) !important;
+  background-color: var(--matugen-surface-container-high) !important;
+  border-color: var(--matugen-primary) !important;
 }
 
 .urlbarView-url {
-    color: var(--matugen-primary) !important;
+  color: var(--matugen-primary) !important;
 }
 
 #permissions-granted-icon {
-    color: var(--matugen-primary) !important;
+  color: var(--matugen-primary) !important;
 }
 
 /* Let the wallpaper show through Zen's empty/new-tab content surface. Web
@@ -122,33 +122,33 @@
 #zen-appcontent-wrapper,
 .browserContainer,
 .browserStack {
-    background: transparent !important;
-    background-color: transparent !important;
+  background: transparent !important;
+  background-color: transparent !important;
 }
 
 #zen-browser-background::before,
 #zen-browser-background::after {
-    background-blend-mode: normal !important;
+  background-blend-mode: normal !important;
 }
 
 #zen-browser-background::before {
-    opacity: 0 !important;
-    background: transparent !important;
+  opacity: 0 !important;
+  background: transparent !important;
 }
 
 #zen-browser-background::after {
-    opacity: 1 !important;
-    background: var(--zen-matugen-main-surface) !important;
+  opacity: 1 !important;
+  background: var(--zen-matugen-main-surface) !important;
 }
 
 #urlbar-input,
 #searchbar .searchbar-textbox {
-    color: var(--matugen-on-surface) !important;
+  color: var(--matugen-on-surface) !important;
 }
 
 /* Make selected/focused controls use the current Matugen accent. */
 :focus-visible,
 toolbarbutton[checked="true"],
 toolbarbutton[open="true"] {
-    outline-color: var(--matugen-primary) !important;
+  outline-color: var(--matugen-primary) !important;
 }

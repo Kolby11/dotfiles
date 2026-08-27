@@ -44,8 +44,10 @@ output_path = '~/.config/zen/zen-matugen.css'
 # ── kitty ────────────────────────────────────────────────────────────────────
 # kitty.conf `include`s current-theme.conf; SIGUSR1 makes running kitties
 # live-reload their config. starship inherits its colors from this ANSI palette.
+# input_path is templates/active/ - the `look` CLI populates it, per file, with
+# the current look's override or the base copy (look/.config/look/looks/base).
 [templates.kitty]
-input_path = '~/.config/matugen/templates/matugen-kitty.conf'
+input_path = '~/.config/matugen/templates/active/matugen-kitty.conf'
 output_path = '~/.config/kitty/current-theme.conf'
 # Reload every running Kitty after the included theme file is regenerated.
 # Use exact process matching so an empty pid list cannot turn into a bad kill
@@ -68,3 +70,28 @@ post_hook = 'bash "$HOME/.config/matugen/scripts/merge-vscode.sh" || true'
 input_path = '~/.config/matugen/templates/matugen-omp.json'
 output_path = '~/.config/omp/palette.json'
 post_hook = 'bash "$HOME/.config/matugen/scripts/merge-omp.sh" || true'
+
+# ── Spicetify ────────────────────────────────────────────────────────────────
+# Keep Spotify's palette and translucent CSS in the same Matugen pass as Kitty
+# and VS Code. The mutable dotfiles launcher consumes these theme sources at
+# runtime, so palette changes do not require a Nix rebuild.
+# input_path is templates/active/ - see the kitty note above; the `look` CLI
+# swaps these for the current look's aesthetic (glass, gloss, pill controls).
+[templates.spicetify]
+input_path = '~/.config/matugen/templates/active/matugen-spicetify.ini'
+output_path = '~/.config/dotfiles/spicetify/.config/spicetify/Themes/Matugen/color.ini'
+
+# ── Spicetify: Liquify tint ─────────────────────────────────────────────────
+# The vendored Liquify theme (Themes/Liquify/user-base.css) is glassmorphic but
+# hue-neutral. This renders the active look's tint and the post_hook stitches
+# `user-base.css + _look-tint.css` into the `user.css` Spicetify actually loads.
+# Must stay ABOVE spicetify_css so the stitch happens before spicetify-refresh.
+[templates.spicetify_liquify]
+input_path = '~/.config/matugen/templates/active/matugen-liquify.css'
+output_path = '~/.config/dotfiles/spicetify/.config/spicetify/Themes/Liquify/_look-tint.css'
+post_hook = 'T="$HOME/.config/dotfiles/spicetify/.config/spicetify/Themes/Liquify"; cat "$T/user-base.css" "$T/_look-tint.css" > "$T/user.css"'
+
+[templates.spicetify_css]
+input_path = '~/.config/matugen/templates/active/matugen-spicetify.css'
+output_path = '~/.config/dotfiles/spicetify/.config/spicetify/Themes/Matugen/user.css'
+post_hook = 'bash "$HOME/.config/dotfiles/spicetify/.local/bin/spicetify-refresh" || true'

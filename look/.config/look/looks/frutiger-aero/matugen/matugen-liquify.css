@@ -1,0 +1,151 @@
+/* ============================================================================
+ * Frutiger Aero tint for the Liquify Spicetify theme
+ *
+ * Appended after Themes/Liquify/user-base.css. Liquify supplies the liquid-
+ * glass structure (theme.js-driven SVG refraction, blurred cover-art
+ * background, white rims); this layer pushes it toward Frutiger Aero: an
+ * aqua-and-lime wash, glossy green rims, chunkier bubbles and a wet-looking
+ * accent. All hues come from Matugen so it still tracks the wallpaper.
+ * ==========================================================================*/
+
+:root {
+  --fa-primary: {{ colors.primary.default.hex }};
+  --fa-primary-container: {{ colors.primary_container.default.hex }};
+  --fa-on-primary: {{ colors.on_primary.default.hex }};
+  --fa-secondary: {{ colors.secondary.default.hex }};
+  --fa-tertiary: {{ colors.tertiary.default.hex }};
+  --fa-surface: {{ colors.surface.default.hex }};
+  --fa-on-surface: {{ colors.on_surface.default.hex }};
+
+  /* Bubblier than stock Liquify (20px). */
+  --liquify-main-radius: 26px;
+  --liquify-nav-radius: 26px;
+  --liquify-right-radius: 26px;
+
+  /* Wetter glass: a touch more blur, a lot more saturation. */
+  --liquify-glass-blur: 14px;
+  --liquify-backdrop-blur: 2.4rem;
+  --liquify-bg-blur: 9px;
+  --liquify-bg-brightness: 52%;
+
+  /* Green-tinted rim: bright aqua top edge, primary-coloured inner glow,
+     hairline of primary instead of plain white. */
+  --liquify-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.60),
+    inset 0 -1px 6px -2px color-mix(in srgb, var(--fa-primary) 55%, transparent),
+    inset 0 0 0 1px color-mix(in srgb, var(--fa-primary) 35%, rgba(255,255,255,0.10)),
+    0 8px 26px -10px color-mix(in srgb, var(--fa-primary) 45%, rgba(0,0,0,0.55));
+}
+
+/* --- Aqua / lime wash across the whole window ---------------------------- */
+/* Sits above Liquify's cover-art background layers (z-index 0) but below the
+   UI, so the album art still shows through the tint. */
+.Root__top-container::before,
+.main-view-container::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(130% 80% at 15% 0%,
+      color-mix(in srgb, var(--fa-primary) 40%, transparent) 0%,
+      transparent 55%),
+    radial-gradient(120% 90% at 100% 100%,
+      color-mix(in srgb, var(--fa-tertiary) 34%, transparent) 0%,
+      transparent 60%),
+    linear-gradient(160deg,
+      color-mix(in srgb, var(--fa-primary) 22%, transparent) 0%,
+      transparent 45%,
+      color-mix(in srgb, var(--fa-secondary) 20%, transparent) 100%);
+  mix-blend-mode: screen;
+}
+
+/* --- Panels: keep them glassy, add a bright top sheen ------------------- */
+.Root__nav-bar,
+.Root__right-sidebar,
+.Root__now-playing-bar,
+.main-nowPlayingView-headerWrapper {
+  background-image:
+    linear-gradient(180deg,
+      rgba(255, 255, 255, 0.22) 0%,
+      rgba(255, 255, 255, 0.04) 14%,
+      transparent 40%),
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--fa-primary) 12%, transparent) 0%,
+      color-mix(in srgb, var(--fa-tertiary) 10%, transparent) 100%) !important;
+  border: 1px solid color-mix(in srgb, var(--fa-primary) 30%, rgba(255,255,255,0.25)) !important;
+}
+
+/* --- Now-playing bar: wet aqua capsule --------------------------------- */
+.Root__now-playing-bar {
+  box-shadow:
+    var(--liquify-shadow),
+    0 0 24px -6px color-mix(in srgb, var(--fa-primary) 50%, transparent) !important;
+}
+
+/* --- Accent controls: aqua jelly with a glossy upper half ------------- */
+.main-playPauseButton-button,
+.main-playButton-PlayButton button,
+button.main-playButton-button {
+  position: relative;
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--fa-primary) 82%, white) 0%,
+      var(--fa-primary) 46%,
+      color-mix(in srgb, var(--fa-primary) 72%, black) 100%) !important;
+  color: var(--fa-on-primary) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    inset 0 -8px 14px -8px rgba(0, 0, 0, 0.45),
+    0 6px 16px -6px color-mix(in srgb, var(--fa-primary) 60%, transparent) !important;
+}
+
+.main-playPauseButton-button::after,
+button.main-playButton-button::after {
+  content: "";
+  position: absolute;
+  inset: 2px 2px 46% 2px;
+  border-radius: 999px;
+  background: linear-gradient(180deg,
+    rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.05));
+  pointer-events: none;
+}
+
+.main-playPauseButton-button:hover,
+button.main-playButton-button:hover {
+  filter: brightness(1.08) saturate(1.12);
+}
+
+/* --- Progress + volume: chunky aqua-to-lime glass rail --------------- */
+.x-progressBar-fillColor,
+.progress-bar__fg,
+.x-volumeBar-volumeBarFill {
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--fa-primary) 70%, white) 0%,
+    var(--fa-primary) 55%,
+    var(--fa-tertiary) 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 0 10px color-mix(in srgb, var(--fa-primary) 55%, transparent) !important;
+}
+
+.progress-bar__slider {
+  background: radial-gradient(circle at 35% 30%,
+    #ffffff 0%, var(--fa-primary) 55%,
+    color-mix(in srgb, var(--fa-primary) 60%, black) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+}
+
+/* --- Generic hover: aqua glow instead of grey ---------------------- */
+button:hover,
+[role="button"]:hover {
+  background-color: color-mix(in srgb, var(--fa-primary) 26%, transparent) !important;
+}
+
+/* --- Green-glass scrollbars -------------------------------------- */
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg,
+    rgba(255, 255, 255, 0.5),
+    color-mix(in srgb, var(--fa-primary) 55%, transparent)) !important;
+}

@@ -1,0 +1,241 @@
+#!/usr/bin/env bash
+#
+# look - hot-swap whole-aesthetic "look" themes.
+#
+# A look is a *form* layer on top of Matugen's colour layer. Matugen still
+# derives every hue from the wallpaper; a look only swaps shapes, gradients,
+# blur, terminal opacity, Hyprland decoration and the quickshell bar style.
+#
+# Looks live in this repo under look/.config/look/looks/<name>/ and are applied
+# to the running desktop without restarting apps.
+
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage: look <command> [name]
+
+Commands:
+  list            List available looks (marks the active one)
+  current         Print the active look
+  set <name>      Apply a look to the running desktop
+  edit <name>     Open the look's directory
+  help            Show this help
+EOF
+}
+
+# ── Paths ────────────────────────────────────────────────────────────────────
+script_path=$(readlink -f "${BASH_SOURCE[0]}")
+repo_dir=$(git -C "$(dirname "$script_path")" rev-parse --show-toplevel)
+looks_dir="$repo_dir/look/.config/look/looks"
+base_dir="$looks_dir/base"
+
+XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
+state_dir="$XDG_STATE_HOME/look"
+state_file="$state_dir/current"
+
+matugen_active="$XDG_CONFIG_HOME/matugen/templates/active"
+kitty_look="$XDG_CONFIG_HOME/kitty/current-look.conf"
+hypr_look="$XDG_CONFIG_HOME/hypr/custom/look.lua"
+ii_config="$XDG_CONFIG_HOME/illogical-impulse/config.json"
+xpui_config="$XDG_CONFIG_HOME/spicetify/config-xpui.ini"
+switchwall="$XDG_CONFIG_HOME/quickshell/ii/scripts/colors/switchwall.sh"
+
+# Matugen templates that a look is allowed to override. Everything else in
+# matugen/config.toml stays pure colour and is not look-swappable.
+#   matugen-spicetify.{css,ini}  -> the built-in "Matugen" Spicetify theme
+#   matugen-kitty.conf           -> kitty ANSI + UI colours
+#   matugen-liquify.css          -> tint appended to the vendored Liquify theme
+active_templates=(
+  matugen-spicetify.css matugen-spicetify.ini matugen-kitty.conf matugen-liquify.css
+)
+
+# ── Helpers ──────────────────────────────────────────────────────────────────
+die() { printf 'look: %s\n' "$*" >&2; exit 1; }
+note() { printf 'look: %s\n' "$*"; }
+
+look_dir() {
+  local name="$1" dir="$looks_dir/$1"
+  [[ -f "$dir/look.toml" ]] || die "unknown look: $name"
+  printf '%s\n' "$dir"
+}
+
+toml_get() {
+  # Minimal TOML scalar reader: toml_get <file> <key>. Prints the unquoted
+  # value of the first non-comment `key = "value"` / `key = value` line.
+  local file="$1" key="$2"
+  [[ -f "$file" ]] || return 0
+  awk -v k="$key" '
+    /^[[:space:]]*#/ { next }
+    {
+      line = $0
+      if (match(line, "^[[:space:]]*" k "[[:space:]]*=[[:space:]]*")) {
+        v = substr(line, RLENGTH + 1)
+        sub(/[[:space:]]*#.*$/, "", v)
+        gsub(/^["'"'"']|["'"'"']$/, "", v)
+        sub(/[[:space:]]+$/, "", v)
+        print v
+        exit
+      }
+    }
+  ' "$file"
+}
+
+populate_active() {
+  # Fill $matugen_active with, per file, the look override if present else the
+  # base copy. Called by `set`, and lazily so a fresh checkout is never broken.
+  local src="$1" f
+  mkdir -p "$matugen_active"
+  for f in "${active_templates[@]}"; do
+    if [[ -n "$src" && -f "$src/matugen/$f" ]]; then
+      cp -f "$src/matugen/$f" "$matugen_active/$f"
+    else
+      cp -f "$base_dir/matugen/$f" "$matugen_active/$f"
+    fi
+  done
+}
+
+ensure_active() {
+  local f
+  for f in "${active_templates[@]}"; do
+    [[ -f "$matugen_active/$f" ]] && continue
+    populate_active ""
+    return
+  done
+}
+
+current_look() { [[ -f "$state_file" ]] && cat "$state_file" || echo "unknown"; }
+
+ini_set() {
+  # ini_set <file> <key> <value> - rewrite `key = value` in place, preserving
+  # the original column alignment. No-op if the key is absent.
+  local file="$1" key="$2" val="$3"
+  [[ -f "$file" ]] || return 0
+  grep -qE "^[[:space:]]*${key}[[:space:]]*=" "$file" || return 0
+  sed -i -E "s|^([[:space:]]*${key}[[:space:]]*=[[:space:]]*).*|\1${val}|" "$file"
+}
+
+apply_spicetify_theme() {
+  # Point config-xpui.ini at the look's Spicetify theme before Matugen runs;
+  # the matugen spicetify post-hook (spicetify-refresh) then reapplies once.
+  local dir="$1" theme scheme
+  theme=$(toml_get "$dir/look.toml" spicetify_theme)
+  scheme=$(toml_get "$dir/look.toml" spicetify_color_scheme)
+  [[ -n "$theme" ]] || return 0
+  ini_set "$xpui_config" current_theme "$theme"
+  ini_set "$xpui_config" color_scheme "${scheme:-$theme}"
+  ini_set "$xpui_config" inject_theme_js 1
+  note "spicetify theme -> $theme"
+}
+
+# ── Commands ─────────────────────────────────────────────────────────────────
+cmd_list() {
+  local active dir name
+  active=$(current_look)
+  for dir in "$looks_dir"/*/; do
+    name=$(basename "$dir")
+    [[ "$name" == "base" ]] && continue
+    [[ -f "$dir/look.toml" ]] || continue
+    if [[ "$name" == "$active" ]]; then
+      printf '* %-16s %s\n' "$name" "$(toml_get "$dir/look.toml" description)"
+    else
+      printf '  %-16s %s\n' "$name" "$(toml_get "$dir/look.toml" description)"
+    fi
+  done
+}
+
+cmd_set() {
+  local name="${1:-}" dir
+  [[ -n "$name" ]] || die "set: missing look name"
+  dir=$(look_dir "$name")
+
+  note "applying '$name'"
+
+  # 1. Matugen form templates -> active/ (matugen reads these on the next run).
+  populate_active "$dir"
+
+  # 2. Hyprland decoration / blur / shadow / animation layer.
+  mkdir -p "$(dirname "$hypr_look")"
+  if [[ -f "$dir/hypr/look.lua" ]]; then
+    cp -f "$dir/hypr/look.lua" "$hypr_look"
+  else
+    : > "$hypr_look"   # custom/general.lua pcall-requires this; keep it valid.
+  fi
+
+  # 3. kitty non-colour knobs (kitty.conf `include`s current-look.conf).
+  mkdir -p "$(dirname "$kitty_look")"
+  if [[ -f "$dir/kitty/look.conf" ]]; then
+    cp -f "$dir/kitty/look.conf" "$kitty_look"
+  else
+    : > "$kitty_look"
+  fi
+
+  # 4. quickshell / illogical-impulse appearance edits.
+  if [[ -f "$dir/quickshell.jq" && -f "$ii_config" ]]; then
+    if jq -f "$dir/quickshell.jq" "$ii_config" > "$ii_config.look.tmp"; then
+      mv "$ii_config.look.tmp" "$ii_config"
+    else
+      rm -f "$ii_config.look.tmp"
+      note "warning: quickshell.jq failed, left config.json untouched"
+    fi
+  fi
+
+  # 5. Spicetify theme selection (Matugen vs vendored Liquify). Done before the
+  #    Matugen run so its spicetify post-hook reapplies exactly once.
+  apply_spicetify_theme "$dir"
+
+  # 6. Wallpaper + palette. switchwall runs matugen, which now reads active/,
+  #    and fires the spicetify-refresh + kitty-reload post_hooks.
+  local wp="" scheme mode swargs=()
+  [[ -f "$dir/wallpaper.txt" ]] && wp=$(sed -n '1p' "$dir/wallpaper.txt")
+  wp="${wp/#\~/$HOME}"
+  scheme=$(toml_get "$dir/look.toml" scheme)
+  mode=$(toml_get "$dir/look.toml" mode)
+  # switchwall falls back to *light* when gsettings has no color-scheme (the
+  # case on this host), which flips the whole palette. Default to dark.
+  [[ -n "$mode" ]] || mode="dark"
+  [[ -n "$scheme" ]] && swargs+=(--type "$scheme")
+  swargs+=(--mode "$mode")
+
+  if [[ -x "$switchwall" ]]; then
+    if [[ -n "$wp" && -f "$wp" ]]; then
+      "$switchwall" "${swargs[@]}" "$wp" || note "warning: switchwall failed"
+    else
+      [[ -n "$wp" ]] && note "wallpaper not found ($wp); keeping current wallpaper"
+      "$switchwall" "${swargs[@]}" --noswitch || note "warning: switchwall failed"
+    fi
+  else
+    note "switchwall.sh not found; running matugen directly"
+    matugen "${swargs[@]}" --noswitch >/dev/null 2>&1 || true
+  fi
+
+  # 7. Reload Hyprland so the decoration layer takes effect.
+  command -v hyprctl >/dev/null 2>&1 && hyprctl reload >/dev/null 2>&1 || true
+
+  # 8. Record + notify.
+  mkdir -p "$state_dir"
+  printf '%s\n' "$name" > "$state_file"
+  command -v notify-send >/dev/null 2>&1 && \
+    notify-send -a "look" "Look: $name" "$(toml_get "$dir/look.toml" description)" || true
+  note "done - '$name' is active"
+}
+
+cmd_edit() {
+  local name="${1:-}" dir
+  [[ -n "$name" ]] || die "edit: missing look name"
+  dir=$(look_dir "$name")
+  "${EDITOR:-xdg-open}" "$dir"
+}
+
+# ── Dispatch ─────────────────────────────────────────────────────────────────
+ensure_active
+
+case "${1:-help}" in
+  list)          cmd_list ;;
+  current)       current_look ;;
+  set)           shift; cmd_set "$@" ;;
+  edit)          shift; cmd_edit "$@" ;;
+  help|-h|--help) usage ;;
+  *)             printf 'look: unknown command: %s\n\n' "$1" >&2; usage >&2; exit 2 ;;
+esac

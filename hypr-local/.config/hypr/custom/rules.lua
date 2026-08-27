@@ -9,14 +9,19 @@ hl.layer_rule({
     xray = false,
 })
 
--- Match the translucent treatment used by Zen. Kitty keeps its transparency
--- inside kitty.conf, while VS Code needs a compositor-level opacity rule.
+-- Match Kitty's 0.85 background_opacity. Kitty keeps its transparency inside
+-- kitty.conf, while Zen and VS Code need a compositor-level opacity rule.
 hl.window_rule({
     match = { class = "^zen$" },
-    opacity = "0.92 0.92 0.92 override",
+    opacity = "0.85 0.85 0.85 override",
 })
 
 hl.window_rule({
     match = { class = "^(code|Code)$" },
-    opacity = "0.92 0.92 0.92 override",
+    opacity = "0.85 0.85 0.85 override",
+})
+
+hl.window_rule({
+    match = { class = "^Spotify$" },
+    opacity = "0.90 0.90 0.90 override",
 })

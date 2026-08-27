@@ -1,0 +1,12 @@
+name = "Default"
+description = "The stock Matugen desktop - flat opaque surfaces, subtle blur."
+
+# Colour source. Omitting `wallpaper.txt` keeps whatever wallpaper is set and
+# just re-runs Matugen. `scheme` / `mode` are optional and, when set, are
+# passed through to switchwall.sh (--type / --mode).
+# scheme = "scheme-fidelity"
+mode = "dark"   # gsettings color-scheme is unset on this host; pin it explicitly
+
+# Spicetify theme this look selects in config-xpui.ini.
+spicetify_theme        = "Matugen"
+spicetify_color_scheme = "Matugen"

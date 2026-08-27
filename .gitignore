@@ -1,1 +1,9 @@
 hyprland-dotfiles/
+
+# Runtime state for the `look` CLI (active look name).
+look/.config/look/state/
+
+# Generated Spicetify CSS - stitched from user-base.css + the look's matugen
+# tint by the matugen spicetify_liquify post_hook.
+spicetify/.config/spicetify/Themes/Liquify/user.css
+spicetify/.config/spicetify/Themes/Liquify/_look-tint.css

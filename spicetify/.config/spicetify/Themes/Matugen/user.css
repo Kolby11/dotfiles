@@ -1,0 +1,69 @@
+/* Matugen-generated Spicetify theme. Window translucency is handled by
+ * Hyprland, so Spotify's own surfaces stay opaque for smooth rendering. */
+
+:root {
+    --matugen-background: #111414;
+    --matugen-surface: #111414;
+    --matugen-surface-container: #1d2020;
+    --matugen-surface-container-high: #272b2a;
+    --matugen-surface-container-highest: #323535;
+    --matugen-on-surface: #e1e3e2;
+    --matugen-primary: #96d1cc;
+
+    --spice-main: #111414 !important;
+    --spice-sidebar: #0c0f0e !important;
+    --spice-player: #1d2020 !important;
+    --spice-card: #272b2a !important;
+}
+
+/* Keep each Spotify surface opaque; Hyprland applies the window opacity. */
+html,
+body,
+#app,
+#main,
+.Root,
+.Root__main-view,
+.Root__main-view-container,
+.main-view-container {
+    background-color: var(--spice-main) !important;
+}
+
+.Root__main-view,
+.Root__main-view-container,
+.main-view-container__scroll-node,
+.main-view-container {
+    background: var(--spice-main) !important;
+}
+
+.Root__nav-bar,
+.Root__now-playing-bar,
+.main-nowPlayingBar-container {
+    background: var(--spice-sidebar) !important;
+}
+
+.main-card-card,
+.main-cardImage-imageWrapper,
+.x-entityImage-imageContainer,
+.main-trackList-trackListRow:hover {
+    background: var(--spice-card) !important;
+}
+
+.main-topBar-background,
+.main-entityHeader-backgroundColor,
+.main-actionBarBackground-background {
+    background: var(--spice-main) !important;
+}
+
+button:hover,
+[role="button"]:hover {
+    background-color: #195854 !important;
+}
+
+/* Keep text and controls readable over the translucent layers. */
+body,
+.encore-text-body-small,
+.encore-text-body-medium,
+.encore-text-title-small,
+.main-trackList-trackListRow {
+    color: #e1e3e2 !important;
+}
