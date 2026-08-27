@@ -1,9 +1,17 @@
 -- Personal general Hyprland settings.
 --
--- The active "look" theme (see the `look` CLI / look/ Stow package) writes its
--- decoration, blur, shadow and animation overrides to custom/look.lua, which
--- is generated and not tracked. Load it if present; a bare desktop with no
--- look selected just keeps the upstream illogical-impulse defaults.
--- Drop any cached copy so `hyprctl reload` re-reads an edited look.lua.
+-- This file is Stow-owned. Two generated, untracked siblings are loaded here
+-- when they exist:
+--   custom/look.lua     the active "look" theme's decoration/blur/animation
+--                       overrides (written by the `look` CLI)
+--   custom/plugins.lua  Nix-built Hyprland plugin loads (written by Home
+--                       Manager's writeHyprlandNixOverrides activation)
+-- Both are optional; with neither present the upstream illogical-impulse
+-- defaults stand. `package.loaded[...] = nil` lets `hyprctl reload` re-read an
+-- edited file instead of returning the cached module.
+
 package.loaded["custom.look"] = nil
 pcall(require, "custom.look")
+
+package.loaded["custom.plugins"] = nil
+pcall(require, "custom.plugins")
